@@ -6,17 +6,24 @@ ipak <- function(pkg){
   sapply(pkg, require, character.only = TRUE)
 }
 
-# usage
-packages <- c("shiny", "dplyr","ggplot2", "tidyr","DT")
+packages <- c("shiny", "dplyr","ggplot2", "tidyr","DT","googlesheets")
 ipak(packages)
+# library(shiny)
+# library(dplyr)
+# library(ggplot2)
+# library(tidyr)
+# library(DT)
+
 
 shinyUI(pageWithSidebar(
   headerPanel("Alberta Aerial Ungulate Survey Program Assessment Tool"),
   sidebarPanel(
     fileInput('MegaDB', 'Step 1. Choose your base AUS priority file.',
               accept='.csv'),
-    sliderInput("AEPBudget", "Step 1: Choose the funding amount (thousands)", min=0, max=3000, value=1200, step = 5),
-    sliderInput("ForecastYr", "Step 2: What year would you like to forecast to?", min=2019, max=2050, value=2040, step=1)
+    sliderInput("AEPBudget", "Step 1: Choose the RELM funding amount (thousands)", min=0, max=3000, value=684, step = 5),
+    sliderInput("EMSDBudget", "Step 2: Choose the EMSD funding amount (thousands)", min=0, max=1250, value=325, step = 5),
+    sliderInput("ForecastYr", "Step 3: What year would you like to forecast to?", min=2019, max=2050, value=2040, step=1),
+    checkboxInput("TopUp","Check if Ops funds will be used to top-up WMUs designated for EMSD funding", FALSE)
 
   ),
   mainPanel(plotOutput("DefForecast"), plotOutput("PerfPlot") , DT::dataTableOutput("AUS_Sched"))
