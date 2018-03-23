@@ -24,7 +24,7 @@ shinyServer(function(input, output,session) {#----
 
 OL <- eventReactive(list(input$MegaDB$datapath,input$AEPBudget, input$EMSDBudget, input$ForecastYr, input$TopUp ), { ####----
 
-  AUS <- reactive({
+
     if (is.null(input$MegaDB$datapath)) {
       AUS <- na.omit(read.csv("./Data/R_Survey_Status_2018_full_Success_V5.csv"))
 
@@ -32,7 +32,7 @@ OL <- eventReactive(list(input$MegaDB$datapath,input$AEPBudget, input$EMSDBudget
       AUS <- na.omit(read.csv(input$MegaDB$datapath))
 
     }
-  })
+
 
 
     AUS <- na.omit(read.csv(paste(input$MegaDB$datapath))) #remove nulls
