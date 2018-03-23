@@ -19,9 +19,28 @@ shinyServer(function(input, output,session) {#----
     sessionInfo()
   })
 
+  dat <- reactive({
+    if (is.null(input$MegaDB$datapath)) {
+      dat <- read.csv("./Data/R_Survey_Status_2018_full_Success_V5.csv")
+      values$file_name = "R_Survey_Status_2018_full_Success_V5.csv"
+      values$file_type = "csv"
+      values$file_size = file.size("R_Survey_Status_2018_full_Success_V5.csv")
+      values$file_path = "R_Survey_Status_2018_full_Success_V5.csv"
+    } else {
+      dat <- read.csv(input$MegaDB$datapath)
+      values$file_name = input$MegaDB$name
+      values$file_size = input$MegaDB$size
+      values$file_type = input$MegaDB$type
+      values$file_path = input$MegaDB$datapath
+    }
+  })
+
+
 
 OL <- eventReactive(list(input$MegaDB$datapath,input$AEPBudget, input$EMSDBudget, input$ForecastYr, input$TopUp ), { ####----
 
+
+    if(input$MegaDB$datapath )
     AUS <- na.omit(read.csv(paste(input$MegaDB$datapath))) #remove nulls
     ForecastYr <- input$ForecastYr
     first_int <- AUS[which(AUS$Interval==1),] #select only year 1 budget requests
