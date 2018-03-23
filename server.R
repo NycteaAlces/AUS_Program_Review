@@ -21,11 +21,11 @@ shinyServer(function(input, output,session) {#----
 
   dat <- reactive({
     if (is.null(input$MegaDB$datapath)) {
-      dat <- read.csv("./Data/R_Survey_Status_2018_full_Success_V5.csv")
+      dat <- read.csv("./R_Survey_Status_2018_full_Success_V5.csv")
       values$file_name = "R_Survey_Status_2018_full_Success_V5.csv"
       values$file_type = "csv"
       values$file_size = file.size("R_Survey_Status_2018_full_Success_V5.csv")
-      values$file_path = "./Data/R_Survey_Status_2018_full_Success_V5.csv"
+      values$file_path = "./R_Survey_Status_2018_full_Success_V5.csv"
     } else {
       dat <- read.csv(input$MegaDB$datapath)
       values$file_name = input$MegaDB$name
