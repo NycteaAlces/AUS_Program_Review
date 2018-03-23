@@ -22,20 +22,15 @@ shinyServer(function(input, output,session) {#----
 
 
 
-OL <- eventReactive(list(input$MegaDB$datapath,input$AEPBudget, input$EMSDBudget, input$ForecastYr, input$TopUp ), { ####----
+
+#OL <- eventReactive(list(input$MegaDB$datapath,input$AEPBudget, input$EMSDBudget, input$ForecastYr, input$TopUp ), { ####----
+
+  OL <- eventReactive(list(input$AEPBudget, input$EMSDBudget, input$ForecastYr, input$TopUp ), { ####----
+
+  AUS <- na.omit(read.csv(text=getURL("https://raw.githubusercontent.com/NycteaAlces/AUS_Program_Review/master/Data/R_Survey_Status_2018_full_Success_V5.csv"),  header=T))
 
 
-    if (is.null(input$MegaDB$datapath)) {
-      AUS <- na.omit(read.csv(text=getURL("https://raw.githubusercontent.com/NycteaAlces/AUS_Program_Review/master/Data/R_Survey_Status_2018_full_Success_V5.csv"), skip=7, header=T))
-
-    } else {
-      AUS <- na.omit(read.csv(input$MegaDB$datapath))
-
-    }
-
-
-
-    AUS <- na.omit(read.csv(paste(input$MegaDB$datapath))) #remove nulls
+   # AUS <- na.omit(read.csv(paste(input$MegaDB$datapath))) #remove nulls
     ForecastYr <- input$ForecastYr
     first_int <- AUS[which(AUS$Interval==1),] #select only year 1 budget requests
     first_int <- first_int[which(!is.na(first_int$Budget)),] #remove pesky nulls
