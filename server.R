@@ -26,7 +26,7 @@ OL <- eventReactive(list(input$MegaDB$datapath,input$AEPBudget, input$EMSDBudget
 
 
     if (is.null(input$MegaDB$datapath)) {
-      AUS <- na.omit(read.csv("Data/R_Survey_Status_2018_full_Success_V5.csv"))
+      AUS <- na.omit(read.csv(text=getURL("https://raw.githubusercontent.com/NycteaAlces/AUS_Program_Review/master/Data/R_Survey_Status_2018_full_Success_V5.csv"), skip=7, header=T))
 
     } else {
       AUS <- na.omit(read.csv(input$MegaDB$datapath))
