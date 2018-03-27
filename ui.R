@@ -15,7 +15,9 @@ library(tidyr)
 library(DT)
 library(RCurl)
 library(Cairo)
-options(shiny.usecairo=T)
+library(shinyjs)
+
+#options(shiny.usecairo=T)
 
 shinyUI(pageWithSidebar(
   headerPanel("Alberta Aerial Ungulate Survey Program Assessment Tool"),
@@ -28,5 +30,5 @@ shinyUI(pageWithSidebar(
     checkboxInput("TopUp","Check if Ops funds will be used to top-up WMUs designated for EMSD funding", FALSE)
 
   ),
-  mainPanel(plotOutput("DefForecast"), plotOutput("PerfPlot") , plotOutput("Schedule"),plotOutput("SchedulebyReg"), DT::dataTableOutput("AUS_Sched"))
+  mainPanel(plotOutput("DefForecast"),plotOutput("PerfPlot") , plotOutput("Schedule"),plotOutput("SchedulebyReg"), plotOutput("PredOut20"), plotOutput("PredOut"), DT::dataTableOutput("AUS_Sched"))
     ))
