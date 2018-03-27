@@ -33,7 +33,7 @@ shinyServer(function(input, output,session) {#----
 
 #OL <- eventReactive(list(input$MegaDB$datapath,input$AEPBudget, input$EMSDBudget, input$ForecastYr, input$TopUp ), { ####----
 
-  OL <- eventReactive(list(input$AEPBudget, input$EMSDBudget, input$ForecastYr, input$TopUp ), { ####----
+  OL <- eventReactive(list(input$AEPBudget, input$EMSDBudget, input$ForecastYr, input$TopUp), { ####----
 
   AUS <- na.omit(read.csv(text=getURL("https://raw.githubusercontent.com/NycteaAlces/AUS_Program_Review/master/Data/R_Survey_Status_2018_full_Success_V5.csv"),  header=T))
    # AUS <- na.omit(read.csv(paste(input$MegaDB$datapath))) #remove nulls
@@ -58,8 +58,11 @@ shinyServer(function(input, output,session) {#----
     Years.PredOut <- c()
     Predicted.PredOut <- c()
     Predicted20.PredOut <- c()
-    Pred50.cnt <- c()
-    Pred20.cnt <- c()
+    PredOut <- data.frame(Years=as.numeric(), fit50=as.numeric())
+    PredOut20 <- data.frame(Years=as.numeric(), fit20=as.numeric())
+
+   # Pred50.cnt <- c()
+  #  Pred20.cnt <- c()
 
     print(summary(fit20))
 
@@ -69,24 +72,22 @@ shinyServer(function(input, output,session) {#----
         current.sum.OPS = 0
         current.sum.EM = 0
         current.sum = 0
-        nvect.df <- data.frame(YearSince = as.numeric())
-        # z <-   data.frame(Region= as.character(), WMU = as.character(), Event=as.numeric(), CumSum = as.numeric(), Budget=as.numeric(),Year=as.numeric(), Deficit=as.numeric())
-        # rm(x)
+  #      nvect.df <- data.frame(YearSince = as.numeric())
         for(c in 1:nrow(first_int)){
           current.sum = current.sum + as.numeric(first_int$Budget[c])
-          #print(current.sum)
+
           if( first_int$EOMSD[c]=="EMSD"){
-            #print(paste("Loop # 1 entered, condition 1"))
+
             current.sum.EM = current.sum.EM +  as.numeric(first_int$Budget[c])
 
             if (current.sum.EM <= EMBudg){
-              #print(paste("Loop # 1 entered, condition 2"))
+
               first_int$Event[c] <- y
               first_int$CumSum[c] <- current.sum
               first_int$EMSum[c] <- current.sum.EM
               first_int$YearSince[c] <- 0
             } else if ((current.sum.OPS + as.numeric(first_int$Budget[c])) <= AnnBudg){
-              #print(paste("Loop # 1 entered, condition 3"))
+
               current.sum.OPS <- current.sum.OPS + as.numeric(first_int$Budget[c])
               first_int$Event[c] <- y
               first_int$CumSum[c] <- current.sum
@@ -95,15 +96,13 @@ shinyServer(function(input, output,session) {#----
             else {
 
               x <- first_int[which(first_int$Event == y),]
-              #print(nrow(x))
-              nvect.df <- as.numeric(first_int$YearSince)
               z <- data.frame(Region= x$Region, WMU = x$WMU, Event=x$Event, CumSum = x$CumSum, Budget=x$Budget,Year=x$Year, Deficit=x$DeficitV2)
               break
             }}
           else {
               current.sum.OPS = current.sum.OPS +  as.numeric(first_int$Budget[c])
               if (current.sum.OPS <= AnnBudg){
-                #print(paste("Loop # 2 entered, condition 2"))
+
                 first_int$Event[c] <- y
                 first_int$CumSum[c] <- current.sum
                 first_int$OpsSum[c] <- current.sum.OPS
@@ -111,35 +110,31 @@ shinyServer(function(input, output,session) {#----
               } else if (current.sum.EM <= (EMBudg-18)){
                        next
                 }else  {
-              #  print(paste("Loop # 2 entered, condition 3"))
-                x <- first_int[which(first_int$Event == y),]
 
+                x <- first_int[which(first_int$Event == y),]
                 z <- data.frame(Region= x$Region, WMU = x$WMU, Event=x$Event, CumSum = x$CumSum, Budget=x$Budget,Year=x$Year, Deficit=x$DeficitV2)
                 break
-              }}}
-        print("Head(nvect.df)")
-        print(head(nvect.df))
+                }}}
+
         Schedule <- rbind(z, Schedule)
         first_int$YearSince <-   (first_int$YearSince + 1)
         first_int$DeficitV2 <- (as.numeric(first_int$YearSince)-as.numeric(first_int$Years))
 
         DefCnt.it <- data.frame(cbind(nrow(first_int[which(first_int$DeficitV2 > 0),]), as.numeric(y)))
-        DefCnt <- rbind(DefCnt.it, DefCnt)}
+        DefCnt <- rbind(DefCnt.it, DefCnt)
         nvect.df <- data.frame(Years=as.numeric(first_int$YearSince))
-        print(paste("the number of", nrow(nvect.df)))
-        print(mean(predict(fit50, newdata=nvect.df)))
-
-        Years.PredOut <- append(Years, as.numeric(y))
-        Predicted.PredOut <- append(fit50, as.numeric(mean(predict(fit50, newdata=nvect.df))))
-        Predicted20.PredOut <- append(fit20, as.numeric(mean(predict(fit20, newdata=nvect.df))))
-        TabPred20 <- data.frame(predict(fit20, newdata=nvect.df))
-        TabPred50 <- data.frame(predict(fit50, newdata=nvect.df))
-
-        Pred20.cnt <- append(fit20, as.numeric(nrow(TabPred20)))
-        Pred50.cnt <- append(fit50, as.numeric(nrow(TabPred50)))
+        #  print(paste("The mean predicted percent of units >50% different is ", mean(predict(fit50, newdata=nvect.df$Years)),"."))
+        Years.PredOut <- append(Years.PredOut, as.numeric(y))
+        Predicted.PredOut <- append(Predicted.PredOut, as.numeric(mean(predict(fit50, newdata=nvect.df))))
+        Predicted20.PredOut <- append(Predicted20.PredOut, as.numeric(mean(predict(fit20, newdata=nvect.df))))
 
 
-   }
+
+
+        }
+
+
+    }
 
 
    else { #checkbox not clicked
@@ -148,17 +143,12 @@ shinyServer(function(input, output,session) {#----
        current.sum.OPS = 0
        current.sum.EM = 0
        current.sum = 0
-       # z <-   data.frame(Region= as.character(), WMU = as.character(), Event=as.numeric(), CumSum = as.numeric(), Budget=as.numeric(),Year=as.numeric(), Deficit=as.numeric())
-       # rm(x)
        for(c in 1:nrow(first_int)){
          current.sum = current.sum + as.numeric(first_int$Budget[c])
-         #print(current.sum)
          if( first_int$EOMSD[c]=="EMSD"){
-           #print(paste("Loop # 1 entered, condition 1"))
            current.sum.EM = current.sum.EM +  as.numeric(first_int$Budget[c])
 
            if (current.sum.EM <= EMBudg){
-            # print(paste("Loop # 1 entered, condition 2"))
              first_int$Event[c] <- y
              first_int$CumSum[c] <- current.sum
              first_int$EMSum[c] <- current.sum.EM
@@ -166,18 +156,13 @@ shinyServer(function(input, output,session) {#----
            } else if ((current.sum.OPS + 20) <= AnnBudg){
                 next
           } else {
-           #  print(paste("Loop # 1 entered, condition 4"))
-          #   print(nrow(first_int))
              x <- first_int[which(first_int$Event == y),]
-           #  print(nrow(x))
-            # nvect.df <- data.frame(Years=as.numeric(x$YearSince))
              z <- data.frame(Region= x$Region, WMU = x$WMU, Event=x$Event, CumSum = x$CumSum, Budget=x$Budget,Year=x$Year, Deficit=x$DeficitV2)
              break
            }}
          else {
            current.sum.OPS = current.sum.OPS +  as.numeric(first_int$Budget[c])
            if (current.sum.OPS <= AnnBudg){
-          #   print(paste("Loop # 2 entered, condition 2"))
              first_int$Event[c] <- y
              first_int$CumSum[c] <- current.sum
              first_int$OpsSum[c] <- current.sum.OPS
@@ -185,55 +170,25 @@ shinyServer(function(input, output,session) {#----
            } else if (current.sum.EM <= (EMBudg-18)){
              next
            }else  {
-         #    print(paste("Loop # 2 entered, condition 3"))
              x <- first_int[which(first_int$Event == y),]
-           #  print(nrow(x))
-            # print(nrow(first_int))
-
              z <- data.frame(Region= x$Region, WMU = x$WMU, Event=x$Event, CumSum = x$CumSum, Budget=x$Budget,Year=x$Year, Deficit=x$DeficitV2)
-
              break
            }}}
-       print(head(first_int))
-       print("Try this")
-       print(first_int$YearSince)
+
        Schedule <- rbind(z, Schedule)
        first_int$YearSince <-   (first_int$YearSince + 1)
        first_int$DeficitV2 <- (as.numeric(first_int$YearSince)-as.numeric(first_int$Years))
 
        DefCnt.it <- data.frame(cbind(nrow(first_int[which(first_int$DeficitV2 > 0),]), as.numeric(y)))
        DefCnt <- rbind(DefCnt.it, DefCnt)
-       print("mean(predict(fit50, newdata=nvect.df))")
-       print(mean(predict(fit50, newdata=nvect.df)))
+
        nvect.df <- data.frame(Years=as.numeric(first_int$YearSince))
-       print("head(nvec.df)")
-       print(head(nvect.df))
        #  print(paste("The mean predicted percent of units >50% different is ", mean(predict(fit50, newdata=nvect.df$Years)),"."))
        Years.PredOut <- append(Years.PredOut, as.numeric(y))
        Predicted.PredOut <- append(Predicted.PredOut, as.numeric(mean(predict(fit50, newdata=nvect.df))))
        Predicted20.PredOut <- append(Predicted20.PredOut, as.numeric(mean(predict(fit20, newdata=nvect.df))))
-    #   TabPred20 <- data.frame(predict(fit20, newdata=nvect.df))
-    #   TabPred50 <- data.frame(predict(fit50, newdata=nvect.df))
-    #   print(head(TabPred20))
-    #   print(paste("Pred20.cnt =",as.numeric(nrow(TabPred20[which(TabPred20 > 0.20),]))))
-     #  print(paste("Pred50.cnt =",as.numeric(nrow(TabPred50[which(TabPred50 > 0.50),]))))
-   #    Pred20.cnt <- append(Pred20.cnt, as.numeric(nrow(TabPred20[which(TabPred20 > 0.20),])))
-   #    Pred50.cnt <- append(Pred50.cnt, as.numeric(nrow(TabPred50[which(TabPred20 > 0.50),])))
-     #  print("This is the iterative PredOut")
-      # print(data.frame(Years=Years.PredOut, fit50 = Predicted20.PredOut))
 
-
-       }
-
-
-   #   PredOut.it <- data.frame(cbind(as.numeric(y), cbind(mean(predict(fit50, newdata=data.frame(Years=as.numeric(first_int$YearSince)))))))
-
-
-      #     PredOut.it <- data.frame(cbind(as.numeric(y), mean(predict(fit50, newdata=nvect.df))))
-      #PredOut <- rbind(PredOut,PredOut.it)
-
-     ###########==##############
-     }
+       }}
 
       Schedule <- as.data.frame(Schedule)
       Schedule.V2 <- reshape(data.frame(Region = Schedule$Region, WMU=Schedule$WMU, Event=Schedule$Event, Budget=Schedule$Budget), idvar = c("Region", "WMU"), timevar= "Event", direction = "wide", sep = "-")
@@ -245,9 +200,6 @@ shinyServer(function(input, output,session) {#----
       y <- match(Schedule.V2, cbind(first_int$EOSD, first_int$WMU))#CReate Schedule.V2 with EOMSD column
       PredOut <- data.frame(Years=Years.PredOut,fit50=Predicted.PredOut)
       PredOut20 <- data.frame(Years=Years.PredOut,fit20=Predicted20.PredOut)
-      print("Head of pred.out")
-      print(head(PredOut))
-    #  PredCount <- data.frame(Years=Years.PredOut, Cnt20= Pred20.cnt, Cnt50=Pred50.cnt)
 
       list(Schedule = Schedule.V2,
            Schedule.V2 = Schedule,
@@ -258,8 +210,7 @@ shinyServer(function(input, output,session) {#----
            y=y,
            PredOut = PredOut,
            PredOut20=PredOut20)
-          # PredCount=PredCount)
- #          Data=Data)
+
       })
 
 
