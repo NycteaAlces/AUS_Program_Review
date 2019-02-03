@@ -67,7 +67,7 @@ shinyServer(function(input, output,session) {#----
     print(summary(fit20))
 
  if (input$TopUp==T){
-      for(y in 2019:ForecastYr){
+      for(y in 2020:ForecastYr){
         first_int <- first_int[order(-first_int$DeficitV2),]
         current.sum.OPS = 0
         current.sum.EM = 0
@@ -138,7 +138,7 @@ shinyServer(function(input, output,session) {#----
 
 
    else { #checkbox not clicked
-     for(y in 2019:ForecastYr){
+     for(y in 2020:ForecastYr){
        first_int <- first_int[order(-first_int$DeficitV2),]
        current.sum.OPS = 0
        current.sum.EM = 0
@@ -193,9 +193,9 @@ shinyServer(function(input, output,session) {#----
       Schedule <- as.data.frame(Schedule)
       Schedule.V2 <- reshape(data.frame(Region = Schedule$Region, WMU=Schedule$WMU, Event=Schedule$Event, Budget=Schedule$Budget), idvar = c("Region", "WMU"), timevar= "Event", direction = "wide", sep = "-")
       Deficit.V1 <- reshape(data.frame(Region = Schedule$Region, WMU=Schedule$WMU, Event=Schedule$Event, Budget=Schedule$Deficit), idvar = c("Region", "WMU"), timevar= "Event", direction = "wide", sep = "-")
-      colnames(Schedule.V2) <- c("Region", "WMU", as.numeric(input$ForecastYr):2019)
+      colnames(Schedule.V2) <- c("Region", "WMU", as.numeric(input$ForecastYr):2020)
       Schedule.V3 <- Schedule.V2[,c(1,2, ncol(Schedule.V2):3)]
-      colnames(Deficit.V1) <- c("Region", "WMU", as.numeric(input$ForecastYr):2019)
+      colnames(Deficit.V1) <- c("Region", "WMU", as.numeric(input$ForecastYr):2020)
       colnames(DefCnt) <- c("DefCnt","Year")
       y <- match(Schedule.V2, cbind(first_int$EOSD, first_int$WMU))#CReate Schedule.V2 with EOMSD column
       PredOut <- data.frame(Years=Years.PredOut,fit50=Predicted.PredOut)
